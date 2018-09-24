@@ -3,8 +3,7 @@ package com.microfocus.oo.poc.websocketstreaming.serviceImpl;
 import com.microfocus.oo.poc.websocketstreaming.model.Category;
 import com.microfocus.oo.poc.websocketstreaming.model.Workflow;
 import com.microfocus.oo.poc.websocketstreaming.repository.CategoryRepository;
-import com.microfocus.oo.poc.websocketstreaming.repository.NormalWorkflowRepository;
-import com.microfocus.oo.poc.websocketstreaming.repository.WebfluxWorkflowRepository;
+import com.microfocus.oo.poc.websocketstreaming.repository.WorkflowRepository;
 import com.microfocus.oo.poc.websocketstreaming.serviceIF.WorkflowService;
 import com.microfocus.oo.poc.websocketstreaming.vos.WorkflowVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -25,10 +23,7 @@ import java.util.stream.Collectors;
 public class WorkflowServiceImpl implements WorkflowService {
 
     @Autowired
-    private WebfluxWorkflowRepository webfluxWorkflowRepository;
-
-    @Autowired
-    private NormalWorkflowRepository normalWorkflowRepository;
+    private WorkflowRepository workflowRepository;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -37,35 +32,33 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Transactional
     public boolean createWorkflow(Workflow workflow) {
         workflow.setCategories(getCategoryForWorkflow(workflow));
-        return webfluxWorkflowRepository.save(workflow) != null;
+        return workflowRepository.save(workflow) != null;
 
     }
 
     @Override
     @Transactional
     public Flux<Workflow> getAllWorkflowsWithWebflux() {
-        return webfluxWorkflowRepository.findAll();
+        return Flux.fromIterable(workflowRepository.findAll());
     }
 
     @Override
     @Transactional
     public List<Workflow> getAllWorkflows() {
-        return normalWorkflowRepository.findAll();
+        return workflowRepository.findAll();
     }
 
     @Override
     @Transactional
     public List<WorkflowVO> getAllWorkflowsWithPagination(int pageNumber, int elementsPerPage) {
 
-//        List<Workflow> workflows = webfluxWorkflowRepository.findAll(PageRequest.of(pageNumber - 1,
-//                1000,
-//                Sort.by("id").descending()))
-//                .getContent();
-//
-//        return workflows.stream()
-//                .map(this::convertWorkflowToVo)
-//                .collect(Collectors.toList());
-        return new ArrayList<>();
+        List<Workflow> workflows = workflowRepository.findAll(PageRequest.of(pageNumber - 1,
+                Math.min(elementsPerPage, 1000),
+                Sort.by("id").descending()))
+                .getContent();
+        return workflows.stream()
+                .map(this::convertWorkflowToVo)
+                .collect(Collectors.toList());
     }
 
     @Override

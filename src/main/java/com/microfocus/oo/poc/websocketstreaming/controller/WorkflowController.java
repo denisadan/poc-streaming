@@ -28,7 +28,7 @@ public class WorkflowController {
     private WorkflowService workflowService;
 
     @ApiOperation(value = "Get all workflows")
-    @GetMapping(value = {"/workflow"})
+    @GetMapping(value = {"/workflows"})
     public ResponseEntity<List<Workflow>> getAllWorkflows() {
         List<Workflow> workflows = workflowService.getAllWorkflows();
         return new ResponseEntity<>(workflows, OK);
@@ -54,7 +54,7 @@ public class WorkflowController {
     @ApiOperation(value = "Get all workflows using pagination")
     @GetMapping(value = {"/workflow-pagination"})
     public ResponseEntity<List<WorkflowVO>> getAllWorkflowsUsingPagination(@RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                                                           @RequestParam(value = "pageSize", required = false, defaultValue = "1000") int pageSize) {
+                                                                           @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         final List<WorkflowVO> workflowList = workflowService.getAllWorkflowsWithPagination(pageNum, pageSize);
         return new ResponseEntity<>(workflowList, OK);
     }
