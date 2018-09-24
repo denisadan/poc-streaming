@@ -12,8 +12,7 @@ import javax.persistence.Table;
 @Table(name = "categories")
 public class Category {
     @Id
-    @GeneratedValue(generator = "question_generator")
-    @SequenceGenerator(name = "question_generator", sequenceName = "question_sequence", initialValue = 1000)
+    @GeneratedValue
     private Long id;
 
     @Column
@@ -21,14 +20,6 @@ public class Category {
 
     @Column
     private String description;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -46,8 +37,10 @@ public class Category {
         this.description = description;
     }
 
-    public Category(Long id, String name, String description) {
-        this.id = id;
+    public Category() {
+    }
+
+    public Category(String name, String description) {
         this.name = name;
         this.description = description;
     }

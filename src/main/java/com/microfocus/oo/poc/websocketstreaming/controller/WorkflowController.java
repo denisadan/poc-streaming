@@ -1,13 +1,11 @@
 package com.microfocus.oo.poc.websocketstreaming.controller;
 
+import com.microfocus.oo.poc.websocketstreaming.model.Category;
 import com.microfocus.oo.poc.websocketstreaming.model.Workflow;
-import com.microfocus.oo.poc.websocketstreaming.serviceIF.WorkflowServiceIF;
+import com.microfocus.oo.poc.websocketstreaming.serviceIF.WorkflowService;
 import com.microfocus.oo.poc.websocketstreaming.vos.WorkflowVO;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,67 +16,62 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @RestController
 public class WorkflowController {
 
     @Autowired
-    private WorkflowServiceIF workflowService;
+    private WorkflowService workflowService;
 
-    @ApiOperation(value = "Get workflows",
-            notes = "Get workflows")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Created"),
-            @ApiResponse(code = 400, message = "Bad Request"),
-            @ApiResponse(code = 409, message = "Conflict")
-    })
+    @ApiOperation(value = "Get all workflows")
     @GetMapping(value = {"/workflow"})
-    public ResponseEntity<String> getAllWorkflows() {
-        workflowService.getAllWorkflows();
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<List<Workflow>> getAllWorkflows() {
+        List<Workflow> workflows = workflowService.getAllWorkflows();
+        return new ResponseEntity<>(workflows, OK);
 
     }
 
-    @ApiOperation(value = "Create new workflow",
-            notes = "Create new workflow")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Created"),
-            @ApiResponse(code = 400, message = "Bad Request"),
-            @ApiResponse(code = 409, message = "Conflict")
-    })
-    @PostMapping(value = {"/workflow"})
+    @ApiOperation(value = "Create a new workflow")
+    @PostMapping(value = {"/workflow"}, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createWorkflow(@RequestBody Workflow workflow) {
         if (workflowService.createWorkflow(workflow)) {
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            return new ResponseEntity<>(CREATED);
         } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(BAD_REQUEST);
         }
     }
 
-    @ApiOperation(value = "Get workflows with webflux",
-            notes = "Get workflows")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Created"),
-            @ApiResponse(code = 400, message = "Bad Request"),
-            @ApiResponse(code = 409, message = "Conflict")
-    })
+    @ApiOperation(value = "Get all  workflows using webflux")
     @GetMapping(value = {"/workflow-webflux"})
     public Flux<Workflow> getAllWorkflowsUsingWebflux() {
         return workflowService.getAllWorkflowsWithWebflux();
     }
 
-
-    @ApiOperation(value = "Get workflows with pagination",
-            notes = "Get workflows")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Created"),
-            @ApiResponse(code = 400, message = "Bad Request"),
-            @ApiResponse(code = 409, message = "Conflict")
-    })
+    @ApiOperation(value = "Get all workflows using pagination")
     @GetMapping(value = {"/workflow-pagination"})
     public ResponseEntity<List<WorkflowVO>> getAllWorkflowsUsingPagination(@RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                                                         @RequestParam(value = "pageSize", required = false, defaultValue = "50") int pageSize) {
+                                                                           @RequestParam(value = "pageSize", required = false, defaultValue = "1000") int pageSize) {
         final List<WorkflowVO> workflowList = workflowService.getAllWorkflowsWithPagination(pageNum, pageSize);
-        return new ResponseEntity<>(workflowList, HttpStatus.OK);
+        return new ResponseEntity<>(workflowList, OK);
+    }
 
+    @ApiOperation(value = "Create a new category")
+    @PostMapping(value = {"/category"}, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> createCategories(@RequestBody Category category) {
+        if (workflowService.createCategory(category)) {
+            return new ResponseEntity<>(CREATED);
+        } else {
+            return new ResponseEntity<>(BAD_REQUEST);
+        }
+    }
+
+    @ApiOperation(value = "Get all categories ")
+    @GetMapping(value = {"/categories"})
+    public List<Category> getCategories() {
+        return workflowService.getAllCategories();
     }
 }

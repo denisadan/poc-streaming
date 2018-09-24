@@ -2,18 +2,22 @@ package com.microfocus.oo.poc.websocketstreaming.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "workflows")
 public class Workflow {
 
     @Id
-    @GeneratedValue(generator = "question_generator")
-    @SequenceGenerator(name = "question_generator", sequenceName = "question_sequence", initialValue = 1000)
+    @GeneratedValue
     private Long id;
 
     @Column
@@ -34,39 +38,26 @@ public class Workflow {
     @Column
     private int timeoutValue;
 
-//    @Column
-//    private Set<Category> categories;
-//
-//    @Column
-//    private Set<String> entitlements;
-//
-//    @Column
-//    private Set<String> inputs;
-//
-//    @Column
-//    private Set<String> outputs;
+    @Column
+    @ManyToMany(targetEntity = Category.class, fetch = FetchType.LAZY)
+    @JoinTable(name = "join_categories_workflows", joinColumns = @JoinColumn(name = "category_id"),
+            inverseJoinColumns = @JoinColumn(name = "workflow_id"))
+    private Set<Category> categories = new HashSet<>();
 
-//    public Workflow(String flowPath, String name, String description, String persistenceLevel, boolean isEmptyValues, int timeoutValue, Set<Category> categories, Set<String> entitlements, Set<String> inputs, Set<String> outputs) {
-//        this.flowPath = flowPath;
-//        this.name = name;
-//        this.description = description;
-//        this.persistenceLevel = persistenceLevel;
-//        this.isEmptyValues = isEmptyValues;
-//        this.timeoutValue = timeoutValue;
-//        this.categories = categories;
-//        this.entitlements = entitlements;
-//        this.inputs = inputs;
-//        this.outputs = outputs;
-//    }
-
-
-    public Workflow(String flowPath, String name, String description, String persistenceLevel, boolean isEmptyValues, int timeoutValue) {
+    public Workflow(String flowPath,
+                    String name,
+                    String description,
+                    String persistenceLevel,
+                    boolean isEmptyValues,
+                    int timeoutValue,
+                    Set<Category> categories) {
         this.flowPath = flowPath;
         this.name = name;
         this.description = description;
         this.persistenceLevel = persistenceLevel;
         this.isEmptyValues = isEmptyValues;
         this.timeoutValue = timeoutValue;
+        this.categories = categories;
     }
 
     public Workflow() {
@@ -128,4 +119,11 @@ public class Workflow {
         this.timeoutValue = timeoutValue;
     }
 
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
+    }
 }
